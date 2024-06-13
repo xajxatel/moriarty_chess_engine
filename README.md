@@ -1,16 +1,37 @@
-# moriarty_chess_engine
+# Moriarty Chess Engine
 
-A new Flutter project.
+Moriarty is a powerful and cunning chess engine, inspired by the greatest arch-nemesis of Sherlock Holmes. This Flutter-based application features an interactive chessboard, animated text, and unique UI elements to provide an engaging chess-playing experience.
 
-## Getting Started
+<p align="center">
+  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/ac1ba677-783c-4dc0-a369-775a5b5e8816" alt="mor2">
+</p>
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- **Intelligent AI**: Play against Moriarty, who calculates every move with precision.
+- **Interactive Chessboard**: Tap and move pieces with a responsive and intuitive interface.
+- **Haptic Feedback**: Feel each move with subtle vibrations.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+<p align="center">
+  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/de9d88d1-f93a-4232-a019-69fb5781e044" alt="Game Screen 1" style="display:inline-block;">
+  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/cd381f18-172e-474c-8e1d-1d64b7632b3e" alt="Game Screen 2" style="display:inline-block;">
+</p>
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Minimax Algorithm with Alpha-Beta Pruning
+
+The Moriarty Chess Engine uses the Minimax algorithm with Alpha-Beta Pruning to evaluate the best possible moves. This algorithm helps in efficiently searching the game tree by eliminating branches that don't need to be explored.
+
+- **Minimax**: Evaluates all possible moves up to a certain depth and chooses the move with the optimal outcome for the current player.
+- **Alpha-Beta Pruning**: Optimizes the Minimax algorithm by cutting off branches that cannot influence the final decision, improving performance.
+
+### Positional Scoring
+
+The engine uses predefined positional tables for different pieces, providing a positional score based on the location of each piece on the board. This helps the engine make more strategic decisions.
+
+### Installation
+
+1. **Clone the repository:**
+
+   ```sh
+   git clone https://github.com/xajxatel/moriarty_chess_engine.git
+   cd moriarty_chess_engine
