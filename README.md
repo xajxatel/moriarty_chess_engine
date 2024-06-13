@@ -13,8 +13,8 @@ Moriarty is a powerful and cunning chess engine, inspired by the greatest arch-n
 - **Haptic Feedback**: Feel each move with subtle vibrations.
 
 <p align="center">
-  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/de9d88d1-f93a-4232-a019-69fb5781e044" alt="Game Screen 1" style="display:inline-block;">
-  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/cd381f18-172e-474c-8e1d-1d64b7632b3e" alt="Game Screen 2" style="display:inline-block;">
+  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/de9d88d1-f93a-4232-a019-69fb5781e044" alt="Game Screen 1" height="200">
+  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/cd381f18-172e-474c-8e1d-1d64b7632b3e" alt="Game Screen 2" height="200">
 </p>
 
 ### Minimax Algorithm with Alpha-Beta Pruning
@@ -33,5 +33,5 @@ The engine uses predefined positional tables for different pieces, providing a p
 1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/xajxatel/moriarty_chess_engine.git
+   git clone https://github.com/yourusername/moriarty_chess_engine.git
    cd moriarty_chess_engine
