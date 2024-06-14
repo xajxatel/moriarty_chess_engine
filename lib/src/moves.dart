@@ -1,4 +1,4 @@
-import 'package:moriarty_chess_engine/src/chess_engine_core.dart';
+import 'package:moriarty_chess_engine/src/moriarty_core.dart';
 
 
 class ValidMoves {
@@ -892,4 +892,26 @@ class ValidMoves {
     }
     return false;
   }
+ static List<CellPosition> getValidMovesOfPieceByPosition(
+      List<List<int>> currBoard, CellPosition currentPosition, bool boardViewIsWhite, List<MovesLogModel> moveLogs) {
+  var piece = currBoard[currentPosition.row][currentPosition.col];
+  List<CellPosition> movesWithPossibleCheck = [];
+
+  if (piece.abs() == horsePower) {
+    movesWithPossibleCheck = getValidHorseMoves(currBoard, currentPosition, boardViewIsWhite);
+  } else if (piece.abs() == rookPower) {
+    movesWithPossibleCheck = getValidRookMoves(currBoard, currentPosition, boardViewIsWhite);
+  } else if (piece.abs() == bishopPower) {
+    movesWithPossibleCheck = getValidBishopMoves(currBoard, currentPosition, boardViewIsWhite);
+  } else if (piece.abs() == queenPower) {
+    movesWithPossibleCheck = getValidQueenMoves(currBoard, currentPosition, boardViewIsWhite);
+  } else if (piece.abs() == kingPower) {
+    movesWithPossibleCheck = getValidKingMove(currBoard, currentPosition, boardViewIsWhite, moveLogs);
+  } else if (piece.abs() == pawnPower) {
+    movesWithPossibleCheck = getValidPawnMove(currBoard, currentPosition, boardViewIsWhite);
+  }
+
+  return movesWithPossibleCheck;
+}
+
 }

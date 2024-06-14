@@ -1,8 +1,8 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:moriarty_chess_engine/src/chess_engine.dart';
-import 'package:moriarty_chess_engine/src/chess_engine_core.dart';
+import 'package:moriarty_chess_engine/src/moriarty_engine.dart';
+import 'package:moriarty_chess_engine/src/moriarty_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ChessPage extends StatefulWidget {
@@ -278,7 +278,7 @@ class _ChessPageState extends State<ChessPage> {
     ChessConfig config = ChessConfig(
         fenString: fenInput,
         isPlayerAWhite: isPlayerWhite,
-        difficulty: Difficulty.medium);
+        difficulty: Difficulty.grandmaster);
     chessEngine = ChessEngine(
       config,
       boardChangeCallback: (newData) {
@@ -287,9 +287,9 @@ class _ChessPageState extends State<ChessPage> {
       },
       gameOverCallback: (gameStatus) {
         if (gameStatus == GameOver.blackWins) {
-          _showGameOverPopup(context, 'Moriarty wins');
+          _showGameOverPopup(context, 'Black wins');
         } else if (gameStatus == GameOver.whiteWins) {
-          _showGameOverPopup(context, 'You have defeated Moriarty');
+          _showGameOverPopup(context, 'White wins');
         } else {
           _showGameOverPopup(context, 'Match Draw!');
         }

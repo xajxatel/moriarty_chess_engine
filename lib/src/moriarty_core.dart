@@ -7,7 +7,7 @@ enum ChessPiece { pawn, rook, bishop, horse, queen, king, emptyCell }
 enum GameOver { whiteWins, blackWins, draw }
 
 ///This denotes the difficulty.
-enum Difficulty { tooEasy, easy, medium, hard, asian }
+enum Difficulty { tooEasy, easy, medium, hard, grandmaster }
 
 /// Mapping each piece with its power.
 Map<ChessPiece, int> chessPieceValue = {
@@ -120,7 +120,7 @@ class ChessConfig {
   ChessConfig(
       {required this.isPlayerAWhite,
       this.fenString = '',
-      this.difficulty = Difficulty.hard});
+      this.difficulty = Difficulty.grandmaster});
 }
 
 ///This defines the posistion of a piece in a 2D array.

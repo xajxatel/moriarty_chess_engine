@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:moriarty_chess_engine/src/chess_page.dart';
+import 'package:moriarty_chess_engine/src/page.dart';
 
 class LandingScreen extends StatelessWidget {
   const LandingScreen({Key? key}) : super(key: key);
@@ -18,7 +18,7 @@ class LandingScreen extends StatelessWidget {
             SizedBox(height: screenWidth/6) ,
             Text(
               'Moriarty',
-              style: GoogleFonts.robotoMono(
+              style: GoogleFonts.anonymousPro(
                 color: Colors.white,
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
