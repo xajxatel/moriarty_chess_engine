@@ -6,14 +6,14 @@ import 'package:moriarty_chess_engine/helpers/models.dart';
 import 'package:moriarty_chess_engine/engine/moriarty.dart';
 import 'package:moriarty_chess_engine/helpers/moves.dart';
 
-class ChessPage extends StatefulWidget {
-  const ChessPage({super.key});
+class GameScreen extends StatefulWidget {
+  const GameScreen({super.key});
 
   @override
-  State<ChessPage> createState() => _ChessPageState();
+  State<GameScreen> createState() => _GameScreenState();
 }
 
-class _ChessPageState extends State<ChessPage> {
+class _GameScreenState extends State<GameScreen> {
   Color secondaryColor = const Color(0xfff5811d);
   Color bgColor = const Color(0xff1E1E1E); // Dark Grey
   Color iconsTextColor = const Color(0xffFFFFFF);
@@ -24,7 +24,7 @@ class _ChessPageState extends State<ChessPage> {
   late bool isPlayerTurn;
   bool isPlayerWhite = true;
   CellPosition? currSelectedElementPosition;
-  late ChessEngine chessEngine;
+  late MoriartyChessEngine chessEngine;
   List<List<int>> boardData = [
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -74,18 +74,20 @@ class _ChessPageState extends State<ChessPage> {
                     Navigator.of(context).pop();
                     _showDifficultyPopup(context);
                   },
+                  
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey.shade800,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    ),
+                    
+                  ),
                   child: Text(
                     'Play Again',
                     style: GoogleFonts.robotoMono(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade800,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero,
                     ),
                   ),
                 ),
@@ -370,7 +372,7 @@ class _ChessPageState extends State<ChessPage> {
     ChessConfig config = ChessConfig(
         isPlayerAWhite: isPlayerWhite,
         difficulty: difficulty);
-    chessEngine = ChessEngine(
+    chessEngine = MoriartyChessEngine(
       config,
       boardChangeCallback: (newData) {
         boardData = newData;
@@ -420,7 +422,7 @@ class _ChessPageState extends State<ChessPage> {
   Future<void> computerTurn() async {
     Future.delayed(const Duration(milliseconds: 200), () async {
       isPlayerTurn = false;
-      MovesModel? pos = await chessEngine.generateBestMove(Duration(milliseconds: 4000));
+      MovesModel? pos = await chessEngine.generateBestMove(const Duration(milliseconds: 4000));
       if (pos == null) {
         return;
       }
@@ -451,7 +453,7 @@ class _ChessPageState extends State<ChessPage> {
 
         title: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 13,
             ),
             Text(
@@ -556,7 +558,7 @@ class _ChessPageState extends State<ChessPage> {
             ((index ~/ 8) + (index % 8)) % 2 == 0 ? lightSquare : darkSquare;
         for (var element in validMoves) {
           if (element.row == (index ~/ 8) && element.col == (index % 8)) {
-            color = Color.fromARGB(236, 255, 217, 0);
+            color = const Color.fromARGB(236, 255, 217, 0);
             break;
           }
         }

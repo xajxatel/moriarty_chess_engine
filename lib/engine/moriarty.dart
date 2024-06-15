@@ -6,7 +6,7 @@ import 'dart:math';
 import 'package:moriarty_chess_engine/helpers/models.dart';
 import 'package:moriarty_chess_engine/helpers/moves.dart';
 
-class ChessEngine {
+class MoriartyChessEngine {
   // Position tables
   List<List<double>> _whitePawnTable = [];
   List<List<double>> _whiteHorseTable = [];
@@ -46,7 +46,7 @@ class ChessEngine {
   int _halfMoveClock = 0;
   int _fullMoveNumber = 0;
 
-  ChessEngine(ChessConfig config,
+  MoriartyChessEngine(ChessConfig config,
       {required Function(List<List<int>>) boardChangeCallback,
       required Function(GameOver) gameOverCallback,
       required Function(bool) checkCallback,
@@ -236,23 +236,23 @@ class ChessEngine {
     var peice = currBoard[currentPosition.row][currentPosition.col];
     List<CellPosition> movesWithPossibleCheck = [];
     if (peice.abs() == horsePower) {
-      movesWithPossibleCheck = ValidMoves.getValidHorseMoves(
+      movesWithPossibleCheck = Moves.getValidHorseMoves(
           currBoard, currentPosition, boardViewIsWhite);
     }
     if (peice.abs() == rookPower) {
-      movesWithPossibleCheck = ValidMoves.getValidRookMoves(
+      movesWithPossibleCheck = Moves.getValidRookMoves(
           currBoard, currentPosition, boardViewIsWhite);
     } else if (peice.abs() == bishopPower) {
-      movesWithPossibleCheck = ValidMoves.getValidBishopMoves(
+      movesWithPossibleCheck = Moves.getValidBishopMoves(
           currBoard, currentPosition, boardViewIsWhite);
     } else if (peice.abs() == queenPower) {
-      movesWithPossibleCheck = ValidMoves.getValidQueenMoves(
+      movesWithPossibleCheck = Moves.getValidQueenMoves(
           currBoard, currentPosition, boardViewIsWhite);
     } else if (peice.abs() == kingPower) {
-      movesWithPossibleCheck = ValidMoves.getValidKingMove(
+      movesWithPossibleCheck = Moves.getValidKingMove(
           currBoard, currentPosition, boardViewIsWhite, _moveLogs);
     } else if (peice.abs() == pawnPower) {
-      movesWithPossibleCheck = ValidMoves.getValidPawnMove(
+      movesWithPossibleCheck = Moves.getValidPawnMove(
           currBoard, currentPosition, boardViewIsWhite);
     }
 
@@ -387,11 +387,11 @@ MoveScore iterativeDeepeningSearch(List<List<int>> board, int maxDepth, bool max
 
   for (int currentDepth = 1; currentDepth <= maxDepth; currentDepth++) {
     _nodeCounter = 0; // Reset the node counter at each depth
-    DateTime depthStartTime = DateTime.now(); // Track start time for each depth
+    
     bestMoveScore = _principalVariationSearch(board, currentDepth, alpha, beta, maximizingPlayer, stopwatch: stopwatch, timeLimit: timeLimit);
     
     // Calculate and print time taken for current depth
-    Duration depthTimeTaken = DateTime.now().difference(depthStartTime);
+    
     // print('Depth: $currentDepth, Nodes searched: $_nodeCounter, Time taken: ${depthTimeTaken.inMilliseconds} ms');
     
     // Check if the time limit has been exceeded

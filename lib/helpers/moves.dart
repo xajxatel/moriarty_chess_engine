@@ -1,7 +1,7 @@
 import 'package:moriarty_chess_engine/helpers/models.dart';
 
 
-class ValidMoves {
+class Moves {
   ///This method is used to find the Valid horse move in the given board.
   static List<CellPosition> getValidHorseMoves(
       List<List<int>> board, CellPosition currPosition, bool boardViewIsWhite) {

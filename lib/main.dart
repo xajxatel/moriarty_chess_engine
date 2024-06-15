@@ -3,11 +3,11 @@ import 'package:moriarty_chess_engine/screens/home.dart';
 
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Moriarty());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class Moriarty extends StatelessWidget {
+  const Moriarty({super.key});
 
   @override
   Widget build(BuildContext context) {
