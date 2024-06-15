@@ -2,9 +2,9 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:moriarty_chess_engine/src/moriarty_core.dart';
-import 'package:moriarty_chess_engine/src/moriarty_engine.dart';
-import 'package:moriarty_chess_engine/src/moves.dart';
+import 'package:moriarty_chess_engine/helpers/models.dart';
+import 'package:moriarty_chess_engine/engine/moriarty.dart';
+import 'package:moriarty_chess_engine/helpers/moves.dart';
 
 class ChessPage extends StatefulWidget {
   const ChessPage({super.key});

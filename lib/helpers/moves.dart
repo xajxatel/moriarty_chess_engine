@@ -1,4 +1,4 @@
-import 'package:moriarty_chess_engine/src/moriarty_core.dart';
+import 'package:moriarty_chess_engine/helpers/models.dart';
 
 
 class ValidMoves {

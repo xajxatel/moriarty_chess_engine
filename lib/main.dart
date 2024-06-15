@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moriarty_chess_engine/home.dart';
+import 'package:moriarty_chess_engine/screens/home.dart';
 
 
 void main() {

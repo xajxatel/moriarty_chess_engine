@@ -3,8 +3,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:moriarty_chess_engine/src/moriarty_core.dart';
-import 'package:moriarty_chess_engine/src/moves.dart';
+import 'package:moriarty_chess_engine/helpers/models.dart';
+import 'package:moriarty_chess_engine/helpers/moves.dart';
 
 class ChessEngine {
   // Position tables
@@ -392,11 +392,11 @@ MoveScore iterativeDeepeningSearch(List<List<int>> board, int maxDepth, bool max
     
     // Calculate and print time taken for current depth
     Duration depthTimeTaken = DateTime.now().difference(depthStartTime);
-    print('Depth: $currentDepth, Nodes searched: $_nodeCounter, Time taken: ${depthTimeTaken.inMilliseconds} ms');
+    // print('Depth: $currentDepth, Nodes searched: $_nodeCounter, Time taken: ${depthTimeTaken.inMilliseconds} ms');
     
     // Check if the time limit has been exceeded
     if (stopwatch.elapsed > timeLimit) {
-      print('Time Limit Exceeded (TLE) at depth $currentDepth');
+      // print('Time Limit Exceeded (TLE) at depth $currentDepth');
       break; // Exit if the time limit is exceeded
     }
 
@@ -414,7 +414,7 @@ MoveScore iterativeDeepeningSearch(List<List<int>> board, int maxDepth, bool max
 Future<MovesModel?> generateBestMove(Duration timeLimit) async {
   await Future.delayed(const Duration(milliseconds: 10));
   MoveScore res = iterativeDeepeningSearch(_board, _maxDepth, !chessConfig.isPlayerAWhite, timeLimit);
-  print('Total nodes searched: $_nodeCounter'); // Print the counter value
+  // print('Total nodes searched: $_nodeCounter'); // Print the counter value
   return res.move;
 }
 
