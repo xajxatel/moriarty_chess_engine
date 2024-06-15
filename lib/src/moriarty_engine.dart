@@ -73,7 +73,7 @@ class ChessEngine {
     } else if (chessConfig.difficulty == Difficulty.hard) {
       _maxDepth = 5;
     } else if (chessConfig.difficulty == Difficulty.grandmaster) {
-      _maxDepth = 6;
+      _maxDepth = 8;
     }
   }
 
@@ -157,16 +157,6 @@ class ChessEngine {
 
   List<MovesLogModel> getMovesLogsData() {
     return _moveLogs;
-  }
-
-  Future<MovesModel?> generateBestMove() async {
-    await Future.delayed(const Duration(milliseconds: 10));
-    double alpha = -double.infinity;
-    double beta = double.infinity;
-    MoveScore res = _minimaxWithMoveAlphaBetaPruning(
-        _board, _maxDepth, alpha, beta, !chessConfig.isPlayerAWhite);
-
-    return res.move;
   }
 
   MovesModel? generateRandomMove() {
@@ -271,75 +261,235 @@ class ChessEngine {
 
   bool _isGameOverForThisBoard(List<List<int>> currBoard) {
     int kingCount = 0;
-    for (List<int> ele in currBoard) {
-      for (int item in ele) {
-        if (item.abs() == kingPower) {
-          if (kingCount == 1) {
+    for (List<int> row in currBoard) {
+      for (int piece in row) {
+        if (piece.abs() == kingPower) {
+          kingCount += 1;
+          if (kingCount == 2) {
             return false;
           }
-          kingCount += 1;
         }
       }
     }
     return true;
   }
 
-  MoveScore _minimaxWithMoveAlphaBetaPruning(
-      currBoard, depth, alpha, beta, maximizingPlayer) {
-    if (depth == 0 || _isGameOverForThisBoard(currBoard)) {
-      return MoveScore(move: null, score: _getScoreForBoard(currBoard));
+  int _nodeCounter = 0;
+ 
+
+
+
+MoveScore _principalVariationSearch(List<List<int>> currBoard, int depth, double alpha, double beta, bool maximizingPlayer, {bool isPvNode = true, bool allowNullMove = true, required Stopwatch stopwatch, required Duration timeLimit}) {
+  _nodeCounter++; // Increment the counter each time the function is called
+
+  // Check if the time limit has been exceeded
+  if (stopwatch.elapsed > timeLimit) {
+    // Return a fail-soft value indicating the search was cut off due to time limit
+    return MoveScore(move: null, score: maximizingPlayer ? -double.infinity : double.infinity);
+  }
+
+  if (depth == 0 || _isGameOverForThisBoard(currBoard)) {
+    return MoveScore(move: null, score: _getScoreForBoard(currBoard));
+  }
+
+  // Null move pruning
+  if (allowNullMove && depth > 2 && !isPvNode && !maximizingPlayer && !_isInCheck(currBoard)) {
+    List<List<int>> boardCopy = ChessEngineHelpers.deepCopyBoard(currBoard);
+    // Make a null move (skip a turn for the opponent)
+    double nullMoveEval = -_principalVariationSearch(boardCopy, depth - 1 - 2, -beta, -beta + 1, !maximizingPlayer, isPvNode: false, allowNullMove: false, stopwatch: stopwatch, timeLimit: timeLimit).score;
+    if (nullMoveEval >= beta) {
+      return MoveScore(move: null, score: beta); // Prune the branch
     }
+  }
 
-    if (maximizingPlayer) {
-      double maxEval = -double.infinity;
-      MovesModel? bestMove;
-      List<MovesModel> whitePossibleMove = _getWhitePossibleMove(currBoard);
-      for (MovesModel possibleMove in whitePossibleMove) {
-        List<List<int>> boardCopy = ChessEngineHelpers.deepCopyBoard(currBoard);
-        _movePieceForMinMax(boardCopy, possibleMove);
-        double evaluation = _minimaxWithMoveAlphaBetaPruning(
-                boardCopy, depth - 1, alpha, beta, false)
-            .score;
+  if (maximizingPlayer) {
+    double maxEval = -double.infinity;
+    MovesModel? bestMove;
+    List<MovesModel> possibleMoves = _getWhitePossibleMove(currBoard);
+    possibleMoves.sort((a, b) => _compareMoves(a, b, currBoard, true)); // Move ordering
 
-        MovesModel undoingMove = MovesModel(
-            currentPosition: possibleMove.targetPosition,
-            targetPosition: possibleMove.currentPosition);
-        _movePieceForMinMax(boardCopy, undoingMove);
-        if (evaluation > maxEval) {
-          maxEval = evaluation;
-          bestMove = possibleMove;
-        }
-        alpha = max<double>(alpha, maxEval);
-        if (beta <= alpha) {
-          break;
+    for (int i = 0; i < possibleMoves.length; i++) {
+      MovesModel possibleMove = possibleMoves[i];
+      List<List<int>> boardCopy = ChessEngineHelpers.deepCopyBoard(currBoard);
+      _movePieceForMinMax(boardCopy, possibleMove);
+      
+      double evaluation;
+      if (i == 0 || !isPvNode) {
+        // Full search for the first move or if not a PV node
+        evaluation = _principalVariationSearch(boardCopy, depth - 1, alpha, beta, false, stopwatch: stopwatch, timeLimit: timeLimit).score;
+      } else {
+        // Principal Variation Search for subsequent moves
+        evaluation = _principalVariationSearch(boardCopy, depth - 1, alpha, alpha + 1, false, isPvNode: false, stopwatch: stopwatch, timeLimit: timeLimit).score;
+        if (evaluation > alpha && evaluation < beta) {
+          evaluation = _principalVariationSearch(boardCopy, depth - 1, alpha, beta, false, stopwatch: stopwatch, timeLimit: timeLimit).score;
         }
       }
-      return MoveScore(move: bestMove, score: maxEval);
-    } else {
-      double minEval = double.infinity;
-      MovesModel? bestMove;
-      List<MovesModel> blackPossibleMove = _getBlackPossibleMove(currBoard);
-      for (MovesModel possibleMove in blackPossibleMove) {
-        List<List<int>> boardCopy = ChessEngineHelpers.deepCopyBoard(currBoard);
-        _movePieceForMinMax(boardCopy, possibleMove);
-        double evaluation = _minimaxWithMoveAlphaBetaPruning(
-                boardCopy, depth - 1, alpha, beta, true)
-            .score;
-        MovesModel undoingMove = MovesModel(
-            currentPosition: possibleMove.targetPosition,
-            targetPosition: possibleMove.currentPosition);
-        _movePieceForMinMax(boardCopy, undoingMove);
-        if (evaluation < minEval) {
-          minEval = evaluation;
-          bestMove = possibleMove;
-        }
-        beta = min<double>(beta, minEval);
-        if (beta <= alpha) {
-          break;
+
+      MovesModel undoingMove = MovesModel(currentPosition: possibleMove.targetPosition, targetPosition: possibleMove.currentPosition);
+      _movePieceForMinMax(boardCopy, undoingMove);
+
+      if (evaluation > maxEval) {
+        maxEval = evaluation;
+        bestMove = possibleMove;
+      }
+      alpha = max<double>(alpha, maxEval);
+      if (beta <= alpha) {
+        break;
+      }
+    }
+    return MoveScore(move: bestMove, score: maxEval);
+  } else {
+    double minEval = double.infinity;
+    MovesModel? bestMove;
+    List<MovesModel> possibleMoves = _getBlackPossibleMove(currBoard);
+    possibleMoves.sort((a, b) => _compareMoves(a, b, currBoard, false)); // Move ordering
+
+    for (int i = 0; i < possibleMoves.length; i++) {
+      MovesModel possibleMove = possibleMoves[i];
+      List<List<int>> boardCopy = ChessEngineHelpers.deepCopyBoard(currBoard);
+      _movePieceForMinMax(boardCopy, possibleMove);
+      
+      double evaluation;
+      if (i == 0 || !isPvNode) {
+        // Full search for the first move or if not a PV node
+        evaluation = _principalVariationSearch(boardCopy, depth - 1, alpha, beta, true, stopwatch: stopwatch, timeLimit: timeLimit).score;
+      } else {
+        // Principal Variation Search for subsequent moves
+        evaluation = _principalVariationSearch(boardCopy, depth - 1, beta - 1, beta, true, isPvNode: false, stopwatch: stopwatch, timeLimit: timeLimit).score;
+        if (evaluation > alpha && evaluation < beta) {
+          evaluation = _principalVariationSearch(boardCopy, depth - 1, alpha, beta, true, stopwatch: stopwatch, timeLimit: timeLimit).score;
         }
       }
-      return MoveScore(move: bestMove, score: minEval);
+
+      MovesModel undoingMove = MovesModel(currentPosition: possibleMove.targetPosition, targetPosition: possibleMove.currentPosition);
+      _movePieceForMinMax(boardCopy, undoingMove);
+
+      if (evaluation < minEval) {
+        minEval = evaluation;
+        bestMove = possibleMove;
+      }
+      beta = min<double>(beta, minEval);
+      if (beta <= alpha) {
+        break;
+      }
     }
+    return MoveScore(move: bestMove, score: minEval);
+  }
+}
+
+MoveScore iterativeDeepeningSearch(List<List<int>> board, int maxDepth, bool maximizingPlayer, Duration timeLimit) {
+  double alpha = -double.infinity;
+  double beta = double.infinity;
+  MoveScore bestMoveScore = MoveScore(move: null, score: maximizingPlayer ? -double.infinity : double.infinity);
+  MovesModel? bestMove;
+
+  Stopwatch stopwatch = Stopwatch()..start();
+
+  for (int currentDepth = 1; currentDepth <= maxDepth; currentDepth++) {
+    _nodeCounter = 0; // Reset the node counter at each depth
+    DateTime depthStartTime = DateTime.now(); // Track start time for each depth
+    bestMoveScore = _principalVariationSearch(board, currentDepth, alpha, beta, maximizingPlayer, stopwatch: stopwatch, timeLimit: timeLimit);
+    
+    // Calculate and print time taken for current depth
+    Duration depthTimeTaken = DateTime.now().difference(depthStartTime);
+    print('Depth: $currentDepth, Nodes searched: $_nodeCounter, Time taken: ${depthTimeTaken.inMilliseconds} ms');
+    
+    // Check if the time limit has been exceeded
+    if (stopwatch.elapsed > timeLimit) {
+      print('Time Limit Exceeded (TLE) at depth $currentDepth');
+      break; // Exit if the time limit is exceeded
+    }
+
+    // Update the best move if the time limit has not been exceeded
+    if (bestMoveScore.move != null) {
+      bestMove = bestMoveScore.move;
+    }
+  }
+
+  stopwatch.stop();
+  // Return the best move found within the time limit
+  return MoveScore(move: bestMove, score: bestMoveScore.score);
+}
+
+Future<MovesModel?> generateBestMove(Duration timeLimit) async {
+  await Future.delayed(const Duration(milliseconds: 10));
+  MoveScore res = iterativeDeepeningSearch(_board, _maxDepth, !chessConfig.isPlayerAWhite, timeLimit);
+  print('Total nodes searched: $_nodeCounter'); // Print the counter value
+  return res.move;
+}
+
+
+
+
+
+  int _compareMoves(MovesModel a, MovesModel b, List<List<int>> board,
+      bool maximizingPlayer) {
+    int aValue = board[a.targetPosition.row][a.targetPosition.col].abs();
+    int bValue = board[b.targetPosition.row][b.targetPosition.col].abs();
+
+    int aAttackerValue =
+        board[a.currentPosition.row][a.currentPosition.col].abs();
+    int bAttackerValue =
+        board[b.currentPosition.row][b.currentPosition.col].abs();
+
+    // MVV-LVA for captures
+    if (aValue != 0 && bValue != 0) {
+      int aMVVLVA = aValue - aAttackerValue;
+      int bMVVLVA = bValue - bAttackerValue;
+      return bMVVLVA - aMVVLVA; // Higher MVV-LVA first
+    }
+
+    // If one move is a capture and the other is not, prioritize the capture
+    if (aValue != 0) return -1; // a is a capture, b is not
+    if (bValue != 0) return 1; // b is a capture, a is not
+
+    // Heuristics for development and center control
+    int aDevelopmentScore = _evaluateMoveForDevelopment(a, board);
+    int bDevelopmentScore = _evaluateMoveForDevelopment(b, board);
+    if (aDevelopmentScore != bDevelopmentScore) {
+      return bDevelopmentScore -
+          aDevelopmentScore; // Higher development score first
+    }
+
+    int aCenterControlScore = _evaluateMoveForCenterControl(a);
+    int bCenterControlScore = _evaluateMoveForCenterControl(b);
+    return bCenterControlScore -
+        aCenterControlScore; // Higher center control score first
+  }
+
+  int _evaluateMoveForDevelopment(MovesModel move, List<List<int>> board) {
+    // Develop knights and bishops towards the center
+    int piece = board[move.currentPosition.row][move.currentPosition.col];
+    int targetRow = move.targetPosition.row;
+    int targetCol = move.targetPosition.col;
+
+    if (piece.abs() == horsePower || piece.abs() == bishopPower) {
+      // Prioritize moves that bring knights and bishops to central squares
+      if ((targetRow == 2 ||
+              targetRow == 3 ||
+              targetRow == 4 ||
+              targetRow == 5) &&
+          (targetCol == 2 ||
+              targetCol == 3 ||
+              targetCol == 4 ||
+              targetCol == 5)) {
+        return 1; // Higher score for central squares
+      }
+    }
+
+    return 0; // Default score for other moves
+  }
+
+  int _evaluateMoveForCenterControl(MovesModel move) {
+    // Control the center of the board (d4, e4, d5, e5)
+    int row = move.targetPosition.row;
+    int col = move.targetPosition.col;
+
+    if ((row == 3 || row == 4) && (col == 3 || col == 4)) {
+      return 1; // Higher score for central squares
+    }
+
+    return 0; // Default score for other moves
   }
 
   double _getScoreForBoard(List<List<int>> currBoard) {
@@ -359,28 +509,22 @@ class ChessEngine {
         int piece = currBoard[row][col];
         switch (piece.abs()) {
           case pawnPower:
-            materialScore +=
-                pawnPower * (piece > 0 ? 1 : -1);
+            materialScore += pawnPower * (piece > 0 ? 1 : -1);
             break;
           case rookPower:
-            materialScore +=
-                rookPower * (piece > 0 ? 1 : -1);
+            materialScore += rookPower * (piece > 0 ? 1 : -1);
             break;
           case horsePower:
-            materialScore +=
-                horsePower * (piece > 0 ? 1 : -1);
+            materialScore += horsePower * (piece > 0 ? 1 : -1);
             break;
           case bishopPower:
-            materialScore += bishopPower *
-                (piece > 0 ? 1 : -1);
+            materialScore += bishopPower * (piece > 0 ? 1 : -1);
             break;
           case queenPower:
-            materialScore +=
-                queenPower * (piece > 0 ? 1 : -1);
+            materialScore += queenPower * (piece > 0 ? 1 : -1);
             break;
           case kingPower:
-            materialScore +=
-                kingPower * (piece > 0 ? 1 : -1);
+            materialScore += kingPower * (piece > 0 ? 1 : -1);
             break;
           default:
             break;
@@ -600,10 +744,11 @@ class ChessEngine {
         for (int col = 0; col < 8; col++) {
           int piece = board[row][col];
           if (piece < 0) {
-            List<CellPosition> validMoves =
-                getValidMovesOfPeiceByPosition(board, CellPosition(row: row, col: col));
+            List<CellPosition> validMoves = getValidMovesOfPeiceByPosition(
+                board, CellPosition(row: row, col: col));
             for (CellPosition move in validMoves) {
-              if (move.row == whiteKingPosition.row && move.col == whiteKingPosition.col) {
+              if (move.row == whiteKingPosition.row &&
+                  move.col == whiteKingPosition.col) {
                 return true;
               }
             }
@@ -617,10 +762,11 @@ class ChessEngine {
         for (int col = 0; col < 8; col++) {
           int piece = board[row][col];
           if (piece > 0) {
-            List<CellPosition> validMoves =
-                getValidMovesOfPeiceByPosition(board, CellPosition(row: row, col: col));
+            List<CellPosition> validMoves = getValidMovesOfPeiceByPosition(
+                board, CellPosition(row: row, col: col));
             for (CellPosition move in validMoves) {
-              if (move.row == blackKingPosition.row && move.col == blackKingPosition.col) {
+              if (move.row == blackKingPosition.row &&
+                  move.col == blackKingPosition.col) {
                 return true;
               }
             }
@@ -642,8 +788,7 @@ class ChessEngine {
       currBoard[move.currentPosition.row][move.currentPosition.col + 1] =
           currBoard[move.currentPosition.row][7];
       currBoard[move.currentPosition.row][7] = emptyCellPower;
-    }
-    else {
+    } else {
       currBoard[move.currentPosition.row][move.currentPosition.col - 1] =
           currBoard[move.currentPosition.row][0];
       currBoard[move.currentPosition.row][0] = emptyCellPower;

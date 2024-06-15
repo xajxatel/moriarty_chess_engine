@@ -37,7 +37,7 @@ class LandingScreen extends StatelessWidget {
                   'The great game is afoot..',
                   textStyle: GoogleFonts.robotoMono(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 20,
                   ),
                   speed: const Duration(milliseconds: 100),
                 ),
@@ -70,7 +70,7 @@ class LandingScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const Spacer(flex: 2,),
+            SizedBox(height: screenWidth/10,)
           ],
         ),
       ),

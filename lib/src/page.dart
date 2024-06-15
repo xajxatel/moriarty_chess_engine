@@ -1,9 +1,10 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:moriarty_chess_engine/src/moriarty_engine.dart';
-import 'package:moriarty_chess_engine/src/moriarty_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:moriarty_chess_engine/src/moriarty_core.dart';
+import 'package:moriarty_chess_engine/src/moriarty_engine.dart';
+import 'package:moriarty_chess_engine/src/moves.dart';
 
 class ChessPage extends StatefulWidget {
   const ChessPage({super.key});
@@ -71,7 +72,7 @@ class _ChessPageState extends State<ChessPage> {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    initializeChessEngine(isPlayerWhite);
+                    _showDifficultyPopup(context);
                   },
                   child: Text(
                     'Play Again',
@@ -170,7 +171,7 @@ class _ChessPageState extends State<ChessPage> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
-                initializeChessEngine(true);
+                _showDifficultyPopup(context, true);
               },
               style: TextButton.styleFrom(
                 backgroundColor:
@@ -190,7 +191,7 @@ class _ChessPageState extends State<ChessPage> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
-                initializeChessEngine(false);
+                _showDifficultyPopup(context, false);
               },
               style: TextButton.styleFrom(
                 backgroundColor:
@@ -254,7 +255,98 @@ class _ChessPageState extends State<ChessPage> {
     );
   }
 
-  void initializeChessEngine(bool isWhite) {
+  void _showDifficultyPopup(BuildContext context, [bool? isWhite]) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          title: Text(
+            'Select Difficulty',
+            style: GoogleFonts.robotoMono(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: Text(
+                  'Too Easy',
+                  style: GoogleFonts.robotoMono(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  initializeChessEngine(isWhite ?? true, Difficulty.tooEasy);
+                },
+              ),
+              ListTile(
+                title: Text(
+                  'Easy',
+                  style: GoogleFonts.robotoMono(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  initializeChessEngine(isWhite ?? true, Difficulty.easy);
+                },
+              ),
+              ListTile(
+                title: Text(
+                  'Medium',
+                  style: GoogleFonts.robotoMono(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  initializeChessEngine(isWhite ?? true, Difficulty.medium);
+                },
+              ),
+              ListTile(
+                title: Text(
+                  'Hard',
+                  style: GoogleFonts.robotoMono(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  initializeChessEngine(isWhite ?? true, Difficulty.hard);
+                },
+              ),
+              ListTile(
+                title: Text(
+                  'Grandmaster',
+                  style: GoogleFonts.robotoMono(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  initializeChessEngine(
+                      isWhite ?? true, Difficulty.grandmaster);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void initializeChessEngine(bool isWhite, Difficulty difficulty) {
     isPlayerWhite = isWhite;
     String fenInput = '';
     List<String> parts = [];
@@ -276,9 +368,8 @@ class _ChessPageState extends State<ChessPage> {
       fenInput = parts.join(' ');
     }
     ChessConfig config = ChessConfig(
-        fenString: fenInput,
         isPlayerAWhite: isPlayerWhite,
-        difficulty: Difficulty.grandmaster);
+        difficulty: difficulty);
     chessEngine = ChessEngine(
       config,
       boardChangeCallback: (newData) {
@@ -323,13 +414,13 @@ class _ChessPageState extends State<ChessPage> {
   }
 
   void resetBoard() {
-    initializeChessEngine(isPlayerWhite);
+    _showTeamPickPopup(context);
   }
 
   Future<void> computerTurn() async {
     Future.delayed(const Duration(milliseconds: 200), () async {
       isPlayerTurn = false;
-      MovesModel? pos = await chessEngine.generateBestMove();
+      MovesModel? pos = await chessEngine.generateBestMove(Duration(milliseconds: 4000));
       if (pos == null) {
         return;
       }
@@ -394,7 +485,7 @@ class _ChessPageState extends State<ChessPage> {
                   ),
                 ],
                 isRepeatingAnimation: true,
-                totalRepeatCount: 5,
+                repeatForever: true,
               ),
             ),
           ),
@@ -552,10 +643,9 @@ class _ChessPageState extends State<ChessPage> {
             decoration: BoxDecoration(
               color: color,
             ),
-            width: 30.0,
-            height: 30.0,
+            width: 40.0,
+            height: 40.0,
             child: Container(
-              padding: const EdgeInsets.all(5),
               child: pieceImgPath.isNotEmpty
                   ? Image.asset(pieceImgPath)
                   : const SizedBox.shrink(),

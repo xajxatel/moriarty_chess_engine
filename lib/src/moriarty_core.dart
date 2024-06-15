@@ -22,7 +22,7 @@ Map<ChessPiece, int> chessPieceValue = {
 
 const int pawnPower = 100;
 const int horsePower = 320;
-const int bishopPower = 330;
+const int bishopPower = 335;
 const int rookPower = 500;
 const int queenPower = 900;
 const int kingPower = 20000;
@@ -114,27 +114,58 @@ const List<List<double>> rookSquareTable = [
 
 ///Chess Config Model.
 class ChessConfig {
-  String fenString;
+ 
   Difficulty difficulty;
   bool isPlayerAWhite;
   ChessConfig(
       {required this.isPlayerAWhite,
-      this.fenString = '',
       this.difficulty = Difficulty.grandmaster});
 }
 
 ///This defines the posistion of a piece in a 2D array.
 class CellPosition {
-  int row;
-  int col;
+  final int row;
+  final int col;
+
   CellPosition({required this.row, required this.col});
+
+  // Create a CellPosition object from a map
+  static CellPosition fromMap(Map<String, dynamic> map) {
+    return CellPosition(
+      row: map['row'],
+      col: map['col'],
+    );
+  }
+
+  // Convert a CellPosition object to a map
+  Map<String, dynamic> toMap() {
+    return {
+      'row': row,
+      'col': col,
+    };
+  }
 }
+
 
 ///This defines the moves.
 class MovesModel {
   CellPosition currentPosition;
   CellPosition targetPosition;
   MovesModel({required this.currentPosition, required this.targetPosition});
+  Map<String, dynamic> toMap() {
+    return {
+      'currentPosition': currentPosition.toMap(),
+      'targetPosition': targetPosition.toMap(),
+    };
+  }
+
+  // Creates MovesModel from a Map
+  static MovesModel fromMap(Map<String, dynamic> map) {
+    return MovesModel(
+      currentPosition: CellPosition.fromMap(map['currentPosition']),
+      targetPosition: CellPosition.fromMap(map['targetPosition']),
+    );
+  }
 }
 
 ///This is for Move logs.
@@ -149,51 +180,46 @@ class MoveScore {
   MovesModel? move;
   double score;
   MoveScore({required this.move, required this.score});
+Map<String, dynamic> toMap() {
+    return {
+      'move': move?.toMap(),
+      'score': score,
+    };
+  }
+
+  // Creates MoveScore from a Map
+  static MoveScore fromMap(Map<String, dynamic> map) {
+    return MoveScore(
+      move: map['move'] != null ? MovesModel.fromMap(map['move']) : null,
+      score: map['score'],
+    );
+  }
+
 }
 
 class ChessEngineHelpers {
+  /// Creates a deep copy of the board.
   static List<List<int>> deepCopyBoard(List<List<int>> original) {
-    List<List<int>> copy = [];
-    for (int i = 0; i < original.length; i++) {
-      List<int> rowCopy = [];
-      for (int j = 0; j < original[i].length; j++) {
-        rowCopy.add(original[i][j]);
-      }
-      copy.add(rowCopy);
-    }
-    return copy;
+    return original.map((row) => List<int>.from(row)).toList();
   }
 
+  /// Creates a deep copy of the position table and reverses the positions.
   static List<List<double>> deepCopyAndReversePositionTable(
       List<List<double>> original) {
-    List<List<double>> copy = [];
-    for (int i = 0; i < original.length; i++) {
-      List<double> rowCopy = [];
-      for (int j = 0; j < original[i].length; j++) {
-        rowCopy.add(original[i][j]);
-      }
-      copy.add(rowCopy);
-    }
-    for (List<double> ele in copy) {
-      ele = ele.reversed.toList();
-    }
-    copy = copy.reversed.toList();
-    return copy;
+    return original
+        .map((row) => row.reversed.toList())
+        .toList()
+        .reversed
+        .toList();
   }
 
+  /// Creates a deep copy of the board and reverses the positions.
   static List<List<int>> deepCopyAndReverseBoard(List<List<int>> original) {
-    List<List<int>> copy = [];
-    for (int i = 0; i < original.length; i++) {
-      List<int> rowCopy = [];
-      for (int j = 0; j < original[i].length; j++) {
-        rowCopy.add(original[i][j]);
-      }
-      copy.add(rowCopy);
-    }
-    for (List<int> ele in copy) {
-      ele = ele.reversed.toList();
-    }
-    copy = copy.reversed.toList();
-    return copy;
+    return original
+        .map((row) => row.reversed.toList())
+        .toList()
+        .reversed
+        .toList();
   }
 }
+

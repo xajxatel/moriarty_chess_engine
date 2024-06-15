@@ -892,7 +892,7 @@ class ValidMoves {
     }
     return false;
   }
- static List<CellPosition> getValidMovesOfPieceByPosition(
+ static List<CellPosition> getValidMovesOfPieceByPositions(
       List<List<int>> currBoard, CellPosition currentPosition, bool boardViewIsWhite, List<MovesLogModel> moveLogs) {
   var piece = currBoard[currentPosition.row][currentPosition.col];
   List<CellPosition> movesWithPossibleCheck = [];

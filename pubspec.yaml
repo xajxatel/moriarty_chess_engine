@@ -39,6 +39,7 @@ dependencies:
   haptic_feedback: 
   animated_text_kit: 
   google_fonts: ^6.2.1
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:
