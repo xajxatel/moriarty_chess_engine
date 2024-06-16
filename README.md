@@ -23,9 +23,6 @@ Moriarty is a powerful and cunning chess engine, inspired by the greatest arch-n
 
 The Moriarty Chess Engine uses Principal Variation Search (PVS) as its chief algorithm. PVS is an optimized version of the Minimax algorithm with Alpha-Beta Pruning that assumes the first move is the best and performs a zero-window search for other moves.
 
-- **Principal Variation Search**: PVS is used to efficiently search the game tree by exploring the most promising moves first, optimizing performance by focusing on the principal variation.
-- **Alpha-Beta Pruning**: Integrated with PVS, Alpha-Beta Pruning cuts off branches that cannot influence the final decision, enhancing search efficiency.
-
 ### Minimax Algorithm with Alpha-Beta Pruning
 
 - **Minimax**: Evaluates all possible moves up to a certain depth and chooses the move with the optimal outcome for the current player.
