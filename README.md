@@ -13,13 +13,10 @@ Moriarty is a powerful and cunning chess engine, inspired by the greatest arch-n
 - **Haptic Feedback**: Feel each move with subtle vibrations.
 
 <p align="center">
-  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/de9d88d1-f93a-4232-a019-69fb5781e044" alt="Game Screen 1" height="600">
-  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/cd381f18-172e-474c-8e1d-1d64b7632b3e" alt="Game Screen 2" height="600">
+  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/de9d88d1-f93a-4232-a019-69fb5781e044" alt="Game Screen 1" height="600" style="margin-right: 20px;">
+  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/6769f3e9-dd98-4003-bf1d-c227804df626" alt="moriarty_gif" height="600" style="margin: 0 20px;">
+  <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/cd381f18-172e-474c-8e1d-1d64b7632b3e" alt="Game Screen 2" height="600" style="margin-left: 20px;">
 </p>
-
-![moriarty_gif](https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/6769f3e9-dd98-4003-bf1d-c227804df626)
-
-
 
 ## Chess Algorithms and Techniques
 
