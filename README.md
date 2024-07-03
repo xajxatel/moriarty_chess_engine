@@ -14,10 +14,10 @@ Moriarty is a powerful and cunning chess engine, inspired by the greatest arch-n
 
 <p align="center">
   <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/de9d88d1-f93a-4232-a019-69fb5781e044" alt="Game Screen 1" height="600">
-  ![moriarty_gif](https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/8036ab5a-493c-472c-ba37-c90006f992a6)
   <img src="https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/cd381f18-172e-474c-8e1d-1d64b7632b3e" alt="Game Screen 2" height="600">
 </p>
 
+![moriarty_gif](https://github.com/xajxatel/moriarty_chess_engine/assets/137952206/6769f3e9-dd98-4003-bf1d-c227804df626)
 
 
 
